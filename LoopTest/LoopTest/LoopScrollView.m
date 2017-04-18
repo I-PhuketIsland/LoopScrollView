@@ -62,22 +62,34 @@
     self.timer = nil;
 }
 - (void)setupView {
-    for (int i = 0  ; i<self.imageNames.count + 2; i++) {
-        UIImageView *imageView = [[UIImageView alloc]init];
-        
-        if (i == 0) {
-            imageView.image = [UIImage imageNamed:self.imageNames[self.imageNames.count -1]];
-        }else if (i == self.imageNames.count + 1) {
-            imageView.image = [UIImage imageNamed:self.imageNames[0]];
+    NSMutableArray * arr = [NSMutableArray arrayWithArray:self.imageNames];
+    if ([self.imageNames[0] isKindOfClass:[NSString class]]) {
+        [arr insertObject:self.imageNames.lastObject atIndex:0];
+        [arr addObject:self.imageNames[0]];
+    }else {
+        [arr addObject:[self duplicate:self.imageNames.firstObject]];
+        [arr insertObject:[self duplicate:self.imageNames.lastObject] atIndex:0];
+    }
+    for (int i = 0  ; i<arr.count; i++) {
+        if ([self.imageNames[0] isKindOfClass:[NSString class]]) {
+            UIImageView *imageView = [[UIImageView alloc]init];
+            imageView.image = [UIImage imageNamed:arr[i]];
+            if (self.direction == Rolling_direction_H) {
+                imageView.frame = CGRectMake(self.frame.size.width * i, 0, self.frame.size.width, self.frame.size.height);
+            }else {
+                imageView.frame = CGRectMake(0, self.frame.size.height * i, self.frame.size.width, self.frame.size.height);
+            }
+            [self.scrollView addSubview:imageView];
         }else {
-            imageView.image = [UIImage imageNamed:self.imageNames[i - 1]];
+            UIView *view = [[UIView alloc]init];
+            view = arr[i];
+            if (self.direction == Rolling_direction_H) {
+                view.frame = CGRectMake(self.frame.size.width * i, 0, self.frame.size.width, self.frame.size.height);
+            }else {
+                view.frame = CGRectMake(0, self.frame.size.height * i, self.frame.size.width, self.frame.size.height);
+            }
+            [self.scrollView addSubview:view];
         }
-        if (self.direction == Rolling_direction_H) {
-            imageView.frame = CGRectMake(self.frame.size.width * i, 0, self.frame.size.width, self.frame.size.height);
-        }else {
-            imageView.frame = CGRectMake(0, self.frame.size.height * i, self.frame.size.width, self.frame.size.height);
-        }
-        [self.scrollView addSubview:imageView];
     }
     
 }
@@ -227,7 +239,10 @@
     return _pageControll;
 }
 
-
+- (void)setIsHidenPageController:(BOOL)isHidenPageController {
+    _isHidenPageController = isHidenPageController;
+    self.pageControll.hidden = isHidenPageController;
+}
 
 
 @end
